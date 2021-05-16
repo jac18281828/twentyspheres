@@ -1,3 +1,3 @@
 # twentyspheres
 
-Classic example from computer graphics.  Render 20 spheres using a simple reflection model.
+Classic example from computer graphics.  Render 20 spheres using a simple Phong reflection model.

@@ -27,7 +27,7 @@ namespace image {
         }
 
 
-        void write(std::vector<char> const& buffer, const int width, const int height) {
+        void write(std::vector<unsigned char> const& buffer, const int width, const int height) {
             struct jpeg_compress_struct cinfo;
             struct jpeg_error_mgr       jerr;
 
