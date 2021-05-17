@@ -18,7 +18,7 @@ constexpr auto width = 4000;
 
 void render_image(std::string const& filename) {
 
-  const auto light_source = point<color_t>{178, 178, 220};
+  const auto light_source = point<color_t>{238, 238, 245};
 
   constexpr auto buffer_size = height * width * depth;
   rect<int> screen{width, height};

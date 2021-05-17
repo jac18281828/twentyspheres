@@ -23,7 +23,9 @@ template <typename value_t> struct point {
   value_t z;
 };
 
-constexpr double sqr(const double x) { return x * x; }
+template <typename value_t = double> constexpr value_t sqr(const value_t x) {
+  return x * x;
+}
 
 constexpr char mono(point<color_t> const& rgb) {
   return rgb.x * 0.15 + rgb.y * 0.7 + rgb.z * 0.15;

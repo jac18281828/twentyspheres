@@ -13,7 +13,7 @@ WORKDIR /workspaces/${PROJECT}
 
 COPY include include/
 COPY src src/
-#COPY test test/
+COPY test test/
 COPY CMakeLists.txt .    
 
 ARG BUILD=build
