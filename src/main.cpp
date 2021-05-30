@@ -4,28 +4,27 @@
 #include <thread>
 #include <vector>
 
+#include "bitmap.h"
 #include "color.h"
 #include "image.h"
 #include "render.h"
+#include "tripple.h"
 
 using namespace twenty;
 using namespace std::literals::chrono_literals;
 
 namespace {
 
-constexpr auto height = 4000;
-constexpr auto width = 4000;
+constexpr auto height = 400;
+constexpr auto width = 400;
 
 void render_image(std::string const& filename) {
 
-  const auto light_source = point<color_t>{238, 238, 245};
+  const auto light_source = color3{238, 238, 245};
 
-  constexpr auto buffer_size = height * width * depth;
-  rect<int> screen{width, height};
+  bitmap bmap(width, height);
 
-  screenbuffer_t buffer;
-  buffer.resize(buffer_size);
-  ambient(buffer, light_source, screen);
+  bmap.fill(light_source);
 
   constexpr auto kd = 0.2;
   constexpr auto ks = 0.6;
@@ -42,17 +41,15 @@ void render_image(std::string const& filename) {
     const auto Ny = N / Nx;
     for (int j = 0; j < Ny; ++j) {
       const auto ystep = height / Ny;
-      constexpr auto radius =
-          std::min(width, height) / (std::max(Nx, Ny) + 2) / 2;
+      constexpr auto radius = std::min(width, height) / (std::max(Nx, Ny) + 2) / 2;
       pixel<int> center{i * xstep + xstep / 2, j * ystep + ystep / 2};
-      shade_sphere(buffer, screen, kd + kz, ks - kz, spec_idx, center, radius,
-                   light_source);
+      shade_sphere(bmap, kd + kz, ks - kz, spec_idx, center, radius, light_source);
       kz += spec_step;
     }
   }
 
   auto jpeg = jpegfile(filename);
-  jpeg.write(buffer, width, height);
+  jpeg.write(bmap.buffer(), width, height);
   std::cout << filename << std::endl;
 }
 

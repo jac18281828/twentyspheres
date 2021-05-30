@@ -6,12 +6,16 @@
 
 #include <jpeglib.h>
 
+#include "color.h"
+
 namespace twenty {
 
 constexpr int JPEG_QUALITY = 92;
 
 class jpegfile {
 public:
+  using color_vec = std::vector<color_t>;
+
   jpegfile(std::string const& filepath) {
     m_output = fopen(filepath.c_str(), "wb");
     if (!m_output) {
@@ -24,8 +28,7 @@ public:
     m_output = nullptr;
   }
 
-  void write(std::vector<unsigned char> const& buffer, const int width,
-             const int height) {
+  void write(color_vec const& buffer, const int width, const int height) {
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
 
@@ -44,8 +47,7 @@ public:
     JSAMPROW row_pointer;
 
     while (cinfo.next_scanline < cinfo.image_height) {
-      const auto scanline =
-          cinfo.next_scanline * cinfo.input_components * cinfo.image_width;
+      const auto scanline = cinfo.next_scanline * cinfo.input_components * cinfo.image_width;
       row_pointer = (JSAMPROW)&buffer[scanline];
       jpeg_write_scanlines(&cinfo, &row_pointer, 1);
     }
