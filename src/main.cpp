@@ -6,9 +6,11 @@
 
 #include "bitmap.h"
 #include "color.h"
+#include "environment.h"
 #include "image.h"
 #include "render.h"
 #include "tripple.h"
+#include "twmath.h"
 
 using namespace twenty;
 using namespace std::literals::chrono_literals;
@@ -18,7 +20,63 @@ namespace {
 constexpr auto height = 400;
 constexpr auto width = 400;
 
-void render_image(std::string const& filename) {
+static environment make_environment() {
+  environment env;
+
+  auto xform = transform(vector3{width, height, 1}, vector3{0, 0, 0});
+
+  auto green = spectra{0, 1, 0};
+  auto cptr = std::make_shared<cube>(1, 1, 1, green);
+
+  env.add(element_instance(cptr, xform));
+
+  return env;
+}
+
+static bool is_inside(pixel<int> const& pix, patch4 const& p) {
+  auto start = p.begin();
+  auto v1 = *start;
+  ++start;
+  auto theta = 0.0;
+  while (start != p.end()) {
+    auto next = *start;
+    auto norm = normalize(cross(next, v1));
+  }
+}
+
+static void render(bitmap& bm, patch4 const& p) {
+  // scan p
+  for (int i = 0; i < bm.width(); ++i) {
+    for (int j = 0; j < bm.height(); ++j) {
+      pixel<int> screen{i, j};
+      if (is_inside(screen, p)) {
+        bm.set_pixel(screen, color3{255, 0, 0});
+      }
+    }
+  }
+}
+
+static void render_environment(environment const& env, std::string const& filename) {
+
+  const auto light_source = color3{238, 238, 245};
+
+  bitmap bmap(width, height);
+
+  bmap.fill(light_source);
+
+  for (auto enviter = std::begin(env); enviter != std::end(env); ++enviter) {
+    auto patch_list = enviter->get_patch_list();
+    for (auto patchiter = std::begin(patch_list); patchiter != std::end(patch_list); ++patchiter) {
+      render(bmap, *patch);
+    }
+  }
+
+  auto jpeg = jpegfile(filename);
+  jpeg.write(bmap.buffer(), width, height);
+  std::cout << filename << std::endl;
+}
+
+static void render_image(std::string const& filename) {
 
   const auto light_source = color3{238, 238, 245};
 
@@ -61,7 +119,9 @@ int main(int argc, char* argv[]) {
     std::cerr << "filename expected." << std::endl;
     return 1;
   } else {
-    render_image(argv[1]);
+    const auto filename = argv[1];
+    auto env = make_environment();
+    render_environment(env, filename);
   }
 
   std::this_thread::sleep_for(60s);

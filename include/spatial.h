@@ -6,7 +6,7 @@
 
 namespace twenty {
 
-class spatial {
+class spatial_element {
 public:
   using patch_list = std::list<patch4>;
   using iterator = patch_list::iterator;
